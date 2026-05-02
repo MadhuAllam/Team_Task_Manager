@@ -62,9 +62,19 @@ app.use('/api/dashboard',     dashboardRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/email',         emailRoutes);
 
-app.get('/', (req, res) => {
-  res.send('API is running...');
-});
+const path = require('path');
+
+// Serve frontend in production
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../client/dist')));
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+  });
+} else {
+  app.get('/', (req, res) => {
+    res.send('API is running...');
+  });
+}
 
 initSocket(io);
 
