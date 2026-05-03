@@ -55,7 +55,7 @@ app.use(cors({
 }));
 
 // Handle preflight OPTIONS requests explicitly
-app.options('*', cors());
+app.options('*splat', cors());
 
 app.use(express.json());
 
