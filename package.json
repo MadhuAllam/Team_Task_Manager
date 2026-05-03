@@ -1,0 +1,6 @@
+{
+  "name": "team-task-manager",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Team Task Manager - monorepo root package.json for Railpack Node.js detection"
+}
