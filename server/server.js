@@ -44,10 +44,18 @@ app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (Postman, mobile apps)
     if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) {
+    
+    // Check if origin is allowed, ignoring trailing slashes
+    const isAllowed = allowedOrigins.some(allowed => 
+      allowed === origin || allowed.replace(/\/$/, '') === origin.replace(/\/$/, '')
+    );
+    
+    if (isAllowed) {
       return callback(null, true);
     }
-    return callback(new Error('Not allowed by CORS'));
+    
+    console.error(`CORS blocked request from origin: ${origin}`);
+    return callback(new Error(`Not allowed by CORS: ${origin}`));
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
