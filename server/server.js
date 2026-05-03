@@ -1,23 +1,23 @@
 const dotenv = require('dotenv');
 dotenv.config();
 
-const express    = require('express');
-const http       = require('http');
+const express = require('express');
+const http = require('http');
 const { Server } = require('socket.io');
-const cors       = require('cors');
+const cors = require('cors');
 
-const connectDB             = require('./db/connect');
-const authRoutes            = require('./routes/authRoutes');
-const projectRoutes         = require('./routes/projectRoutes');
-const taskRoutes            = require('./routes/taskRoutes');
-const dashboardRoutes       = require('./routes/dashboardRoutes');
-const uploadRoutes          = require('./routes/uploadRoutes');
-const notificationRoutes    = require('./routes/notificationRoutes');
-const emailRoutes           = require('./routes/emailRoutes');
-const { initSocket }        = require('./socket/socketHandler');
+const connectDB = require('./db/connect');
+const authRoutes = require('./routes/authRoutes');
+const projectRoutes = require('./routes/projectRoutes');
+const taskRoutes = require('./routes/taskRoutes');
+const dashboardRoutes = require('./routes/dashboardRoutes');
+const uploadRoutes = require('./routes/uploadRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
+const emailRoutes = require('./routes/emailRoutes');
+const { initSocket } = require('./socket/socketHandler');
 const { startOverdueEmailJob } = require('./jobs/overdueEmailJob');
 
-const app    = express();
+const app = express();
 const server = http.createServer(app);
 
 const allowedOrigins = [
@@ -54,20 +54,20 @@ app.use(cors({
 app.use(express.json());
 
 // Routes
-app.use('/api/auth',          authRoutes);
-app.use('/api/projects',      projectRoutes);
-app.use('/api/tasks',         taskRoutes);
-app.use('/api/tasks',         uploadRoutes);
-app.use('/api/dashboard',     dashboardRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/projects', projectRoutes);
+app.use('/api/tasks', taskRoutes);
+app.use('/api/tasks', uploadRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/notifications', notificationRoutes);
-app.use('/api/email',         emailRoutes);
+app.use('/api/email', emailRoutes);
 
 const path = require('path');
 
 // Serve frontend in production
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../client/dist')));
-  app.get('/:path*', (req, res) => {
+  app.get('(.*)', (req, res) => {
     res.sendFile(path.join(__dirname, '../client/dist/index.html'));
   });
 } else {
