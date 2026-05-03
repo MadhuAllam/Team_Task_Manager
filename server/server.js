@@ -21,10 +21,10 @@ const app = express();
 const server = http.createServer(app);
 
 const allowedOrigins = [
-  process.env.CLIENT_URL || 'http://localhost:5173',
   'http://localhost:5173',
   'http://localhost:5174',
-];
+  process.env.CLIENT_URL,
+].filter(Boolean);
 
 const io = new Server(server, {
   cors: {
@@ -42,14 +42,20 @@ startOverdueEmailJob();
 
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
+    // Allow requests with no origin (Postman, mobile apps)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
     }
+    return callback(new Error('Not allowed by CORS'));
   },
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }));
+
+// Handle preflight OPTIONS requests explicitly
+app.options('*', cors());
 
 app.use(express.json());
 
