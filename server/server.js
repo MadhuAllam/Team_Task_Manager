@@ -63,7 +63,7 @@ app.use(cors({
 }));
 
 // Handle preflight OPTIONS requests explicitly
-app.options('*splat', cors());
+app.options('/{*splat}', cors());
 
 app.use(express.json());
 
@@ -80,9 +80,18 @@ const path = require('path');
 
 // Serve frontend in production
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../client/dist')));
-  app.get('*splat', (req, res) => {
-    res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+  const distPath = path.join(__dirname, '../client/dist');
+  
+  // Serve static files
+  app.use(express.static(distPath));
+
+  // Use a middleware instead of route for catch-all
+  app.use((req, res, next) => {
+    // Only catch non-API requests
+    if (req.path.startsWith('/api') || req.path.startsWith('/socket.io')) {
+      return next();
+    }
+    res.sendFile(path.join(distPath, 'index.html'));
   });
 } else {
   app.get('/', (req, res) => {
